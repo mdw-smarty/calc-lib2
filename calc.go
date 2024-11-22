@@ -1,4 +1,4 @@
-package calc_lib2
+package calc
 
 type Addition struct{}
 
