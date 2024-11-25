@@ -38,7 +38,6 @@ func TestHandler_InvalidSecondArgument(t *testing.T) {
 	assertError(t, err, invalidArg)
 	assertError(t, err, strconv.ErrSyntax)
 }
-
 func TestHandler_CalculationResultWritten(t *testing.T) {
 	var output bytes.Buffer
 	handler := NewHandler(&calc.Addition{}, &output)
