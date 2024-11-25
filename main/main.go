@@ -1,7 +1,9 @@
 package main
 
 import (
+	"errors"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 
@@ -10,19 +12,41 @@ import (
 
 func main() {
 	calculator := &calc.Addition{}
-	a := parseInt(os.Args[1])
-	b := parseInt(os.Args[2])
-	c := calculator.Calculate(a, b)
-	_, err := fmt.Println(c)
+	handler := NewHandler(calculator, os.Stdout)
+	err := handler.Handle(os.Args[1:])
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 }
 
-func parseInt(s string) int {
-	i, err := strconv.Atoi(s)
-	if err != nil {
-		panic(err)
+type Handler struct {
+	calculator *calc.Addition
+	stdout     *os.File
+}
+
+func NewHandler(calculator *calc.Addition, stdout *os.File) *Handler {
+	return &Handler{
+		calculator: calculator,
+		stdout:     stdout,
 	}
-	return i
+}
+
+func (this *Handler) Handle(args []string) error {
+	if len(args) != 2 {
+		return errors.New("2 operands required")
+	}
+	a, err := strconv.Atoi(args[0])
+	if err != nil {
+		return err
+	}
+	b, err := strconv.Atoi(args[1])
+	if err != nil {
+		return err
+	}
+	c := this.calculator.Calculate(a, b)
+	_, err = fmt.Fprintf(this.stdout, "%d", c)
+	if err != nil {
+		return err
+	}
+	return nil
 }
